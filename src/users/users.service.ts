@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Body, ForbiddenException, Injectable, Param, Patch, UseGuards, Request } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FindOneParams } from './dto/findOne-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -23,11 +26,23 @@ export class UsersService {
   };
 
   async findAll() {
-    return `This action returns all users`;
+    const users = await User.find()
+
+    if (users) {
+      return users;
+    };
+
+    return undefined;
   };
 
-  async findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneById(id: number) {
+    const user = await User.findOneBy({ id: id });
+
+    if (user) {
+      return user
+    };
+
+    return undefined;
   };
 
   async findOneByUsernameWithPassword(username: string) {
@@ -62,11 +77,30 @@ export class UsersService {
   };
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    if (updateUserDto.password) {
+      const hash = await bcrypt.hash(updateUserDto.password, 10);
+
+      updateUserDto.password = hash;
+    };
+
+    const updateUser = await User.update(+id, updateUserDto);
+
+    if (updateUser) {
+      return await User.findOneBy({ id: id });
+    };
+
+    return undefined;
   };
 
   async remove(id: number) {
-    return `This action removes a #${id} user`;
+    const deletedUser = await User.findOneBy({ id: id });
+    deletedUser.remove();
+
+    if (deletedUser) {
+      return deletedUser;
+    };
+
+    return undefined;
   };
 
 };

@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException, Res, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException, Res, Request, BadRequestException, UseGuards, ForbiddenException, ParseIntPipe, Bind } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
 
 import * as bcrypt from 'bcrypt';
+import { FindOneParams } from './dto/findOne-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 
 @Controller('users')
 export class UsersController {
@@ -53,23 +55,93 @@ export class UsersController {
   };
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(@Res() res: Response) {
+
+    const users = await this.usersService.findAll()
+
+    if (!users) {
+      throw new BadRequestException('Aucun user à afficher');
+    };
+
+    return res.status(200).json({
+      status: 'OK',
+      message: 'Users',
+      data: users
+    });
+
   };
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param() params: FindOneParams, @Res() res: Response) {
+
+    const user = await this.usersService.findOneById(+params.id)
+
+    if (!user) {
+
+      throw new BadRequestException('User id inconnu');
+    };
+
+    return res.status(200).json({
+      status: 'OK',
+      message: 'User',
+      data: user
+    });
   };
 
+  @UseGuards(JwtAuthGuard)
+  // @Bind(Param('id'), new ParseIntPipe())
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param() params: FindOneParams, @Body() updateUserDto: UpdateUserDto, @Request() req, @Res() res: Response) {
+
+    const userLogged = req.user;
+
+    const isUser = await this.usersService.findOneById(+params.id);
+
+    if (!isUser) {
+      throw new BadRequestException('User inconnu')
+    };
+
+
+    if (userLogged.id !== isUser.id) {
+      throw new ForbiddenException("Vous n'êtes pas le User à modifier")
+    };
+
+
+    const updatedUser = await this.usersService.update(+params.id, updateUserDto);
+
+    return res.status(200).json({
+      status: 'OK',
+      message: 'User modifié',
+      data: updatedUser
+    });
+
   };
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param() params: FindOneParams, @Request() req, @Res() res: Response) {
+
+    const userLogged = req.user
+
+    const isUser = await this.usersService.findOneById(+params.id);
+
+    if (!isUser) {
+      throw new BadRequestException('User inconnu')
+    };
+
+    if ((userLogged.id !== isUser.id) && !(userLogged.admin)) {
+      throw new ForbiddenException("Vous n'êtes pas admin ou le User à modifier")
+    };
+
+
+    const deletedUser = await this.usersService.remove(+params.id);
+
+    return res.status(200).json({
+      status: 'OK',
+      message: 'User supprimé',
+      data: deletedUser
+    });
+
   };
 
 };

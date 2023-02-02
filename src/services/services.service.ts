@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { Service } from './entities/service.entity';
 
 @Injectable()
 export class ServicesService {
@@ -12,9 +13,14 @@ export class ServicesService {
     return `This action returns all services`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} service`;
-  }
+  async findOne(id: number) {
+    const service = await Service.findOneBy({id});
+
+    if (service) {
+      return service;
+    };
+    return undefined;
+  };
 
   update(id: number, updateServiceDto: UpdateServiceDto) {
     return `This action updates a #${id} service`;
