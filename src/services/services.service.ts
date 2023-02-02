@@ -28,9 +28,7 @@ export class ServicesService {
     return `This action returns a #${id} service`;
   }
 
-  update(id: number, updateServiceDto: UpdateServiceDto) {
-    return `This action updates a #${id} service`;
-  }
+  update(id: number, updateServiceDto: UpdateServiceDto) {}
 
   remove(id: number) {
     return `This action removes a #${id} service`;
