@@ -49,7 +49,13 @@ export class ServicesService {
     return undefined;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} service`;
+  async remove(id: number) {
+    const serviceToRemove = await Service.findOneBy({
+      id: id,
+    });
+    if (serviceToRemove) {
+      return await Service.remove(serviceToRemove);
+    }
+    return undefined;
   }
 }

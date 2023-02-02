@@ -93,9 +93,12 @@ export class ServicesController {
       throw new BadRequestException('User id inconnu');
     }
     const deleteService = await this.servicesService.remove(+id);
+    if (!deleteService) {
+      throw new BadRequestException('Service ID inconnu');
+    }
     return res.status(201).json({
       status: 'SUCCESS',
-      message: 'Service modifié',
+      message: 'Service Supprimé',
       data: deleteService,
     });
   }
