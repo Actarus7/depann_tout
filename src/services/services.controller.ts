@@ -19,6 +19,7 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { Response } from 'express';
 import { UsersService } from 'src/users/users.service';
+import { GetServiceDto } from './dto/get-service.dto';
 
 @Controller('services')
 export class ServicesController {
@@ -52,9 +53,10 @@ export class ServicesController {
     return this.servicesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.servicesService.findOne(+id);
+  @Get('search')
+  async findService(@Body() getServiceDto: GetServiceDto) {
+    const service = await this.servicesService.findName(getServiceDto);
+    return service;
   }
 
   @UseGuards(JwtAuthGuard)
