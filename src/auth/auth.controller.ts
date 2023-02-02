@@ -12,22 +12,22 @@ export class AuthController {
     private authService: AuthService,
     private usersService: UsersService) { }
 
-  // @UseGuards(LocalAuthGuard)
-  // @Post('auth/login')
-  // async login(/* @Body() loginUserDto: LoginUserDto */ @Request() req) { // typage de req ?    
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(/* @Body() loginUserDto: LoginUserDto */ @Request() req) { // typage de req ?    
 
-  //   const user = await this.authService.login(/* loginUserDto */req.user);
-  //   // console.log(user);
+    const user = await this.authService.login(/* loginUserDto */req.user);
+    // console.log(user);
 
-  //   return user;
-  // };
+    return user;
+  };
 
-  /* @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Request() req) {
 
     const user = await this.usersService.findOneByUsername(req.user.username);
 
     return user;
-  }; */
+  };
 };

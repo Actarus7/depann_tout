@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { Equals, IsEmail, IsOptional, IsPostalCode, IsString } from "class-validator";
 
 export class CreateUserDto {
 
@@ -11,6 +11,10 @@ export class CreateUserDto {
     @IsString()
     password: string;
 
+    // @Equals({password: })
+    @IsString()
+    confirm_password: string;
+
     @IsString()
     adress_line1: string;
     
@@ -22,6 +26,7 @@ export class CreateUserDto {
     @IsOptional()
     adress_line3: string;
 
+    // @IsPostalCode({locale: 'FRA'})
     @IsString()
     zipCode: string;
     
