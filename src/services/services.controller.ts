@@ -67,7 +67,7 @@ export class ServicesController {
     @Request() req,
   ) {
     const userIdLogged = req.user.id;
-    const isUserExist = await this.usersService.findOne(+id);
+    const isUserExist = await this.usersService.findOneById(+id);
 
     if (!isUserExist) {
       throw new BadRequestException('User id inconnu');
@@ -87,7 +87,7 @@ export class ServicesController {
   @Delete(':id')
   @Bind(Param('id', new ParseIntPipe()))
   async remove(@Param('id') id: string, @Res() res: Response) {
-    const isUserExist = await this.usersService.findOne(+id);
+    const isUserExist = await this.usersService.findOneById(+id);
 
     if (!isUserExist) {
       throw new BadRequestException('User id inconnu');
