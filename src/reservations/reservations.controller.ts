@@ -30,12 +30,22 @@ export class ReservationsController {
 
 
     // GENERE UN RANDOM ALEATOIRE ET VERIFIE QU'IL N'EXISTE PAS DEJA DANS LA BASE DE DONNEE
-    const numero = Math.floor(Math.random());
-    console.log(numero);
+    const numeroExistants = await this.reservationsService.findAllNumbers();
+
+    // console.log(numeroExistants);
+    
+    const numero = Math.floor(Math.random()*10000);
 
 
-    return this.reservationsService.create(createReservationDto);
-  };
+    const newReservation = await this.reservationsService.create(createReservationDto, numero, userIdLogged);
+
+    return res.status(201).json({
+      status: 'OK',
+      message: 'Réservation créée',
+      data: newReservation
+    });
+
+ };
 
   @Get()
   findAll() {
