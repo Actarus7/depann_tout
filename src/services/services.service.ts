@@ -24,7 +24,12 @@ export class ServicesService {
   }
 
   findAll() {
-    return `This action returns all services`;
+    const allServices = Service.find();
+
+    if (allServices) {
+      return allServices;
+    }
+    return undefined;
   }
 
   async findName(getServiceDto: GetServiceDto) {

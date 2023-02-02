@@ -50,7 +50,8 @@ export class ServicesController {
 
   @Get()
   findAll() {
-    return this.servicesService.findAll();
+    const getAll = this.servicesService.findAll();
+    return getAll;
   }
 
   @Get('search')
