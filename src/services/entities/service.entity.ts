@@ -1,6 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity()
+@Entity('services')
 export class Service extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -22,4 +29,7 @@ export class Service extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   reserved: boolean;
+
+  @ManyToOne(() => User, (user) => user.service)
+  user: User;
 }
