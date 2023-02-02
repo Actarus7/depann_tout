@@ -1,3 +1,4 @@
+import { Exclude } from "class-transformer";
 import { Reservation } from "src/reservations/entities/reservation.entity";
 import { Service } from "src/services/entities/service.entity";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
@@ -11,23 +12,27 @@ export class User extends BaseEntity {
     @Column({ type: 'varchar' })
     username: string;
 
+    @Column({type: 'varchar'})
+    e_mail: string;
+
     @Column({ type: 'varchar' })
+    @Exclude()
     password: string;
 
     @Column({ type: 'varchar' })
-    adress_line1: string
+    adress_line1: string;
+
+    @Column({ type: 'varchar', nullable: true})
+    adress_line2: string;
+
+    @Column({ type: 'varchar', nullable: true })
+    adress_line3: string;
 
     @Column({ type: 'varchar' })
-    adress_line2: string
+    zipCode: string;
 
     @Column({ type: 'varchar' })
-    adress_line3: string
-
-    @Column({ type: 'varchar' })
-    zipCode: string
-
-    @Column({ type: 'varchar' })
-    city: string
+    city: string;
 
     @OneToMany(() => Service, service => service.user)
     services: Service[];
