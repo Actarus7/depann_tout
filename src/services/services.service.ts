@@ -23,9 +23,25 @@ export class ServicesService {
     return undefined;
   }
 
-  findAll() {
-    return `This action returns all services`;
-  }
+  async findAll() {
+    const services = await Service.find();
+
+    if (services) {
+      return services;
+    };
+    
+    return undefined;
+  };
+
+  async findOne(id: number) {
+    const service = await Service.findOneBy({id});
+
+    if (service) {
+      return service;
+    };
+    
+    return undefined;
+  };
 
   async findName(getServiceDto: GetServiceDto) {
     const findServices = await Service.findBy({
