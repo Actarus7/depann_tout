@@ -27,10 +27,9 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     ReservationsModule,
     ServicesModule,
-    AuthModule],
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-
-
-export class AppModule { }
+export class AppModule {}
