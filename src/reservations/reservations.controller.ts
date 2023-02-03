@@ -50,7 +50,7 @@ export class ReservationsController {
 
     // SWITCH LA PROPRIETE "RESERVED FALSE" DU SERVICE DE FALSE A TRUE
 
-    const updatedService = await this.servicesService.updateReserved(isServiceExists.id)
+    const updatedService = await this.servicesService.updateReserved(createReservationDto.service)
 
     return res.status(201).json({
       status: 'OK',
