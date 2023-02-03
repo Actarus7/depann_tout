@@ -25,7 +25,11 @@ export class ServicesService {
   }
 
   async findAll() {
-    const services = await Service.findBy({ reserved: false });
+    const services = await Service.find({
+      relations: { user: true },
+      select: { user: { username: true } },
+      where: { reserved: false },
+    });
 
     if (services) {
       return services;
@@ -35,7 +39,11 @@ export class ServicesService {
   }
 
   async findOne(id: number) {
-    const service = await Service.findOneBy({ id, reserved: false });
+    const service = await Service.find({
+      relations: { user: true },
+      select: { user: { username: true } },
+      where: { id, reserved: false },
+    });
 
     if (service) {
       return service;
@@ -45,9 +53,10 @@ export class ServicesService {
   }
 
   async findName(getServiceDto: GetServiceDto) {
-    const findServices = await Service.findBy({
-      name: Like(`%${getServiceDto.name}%`),
-      reserved: false,
+    const findServices = await Service.find({
+      relations: { user: true },
+      select: { user: { username: true } },
+      where: { name: Like(`%${getServiceDto.name}%`), reserved: false },
     });
 
     if (findServices) {
