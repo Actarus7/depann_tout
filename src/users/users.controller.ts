@@ -12,14 +12,13 @@ import {
   BadRequestException,
   UseGuards,
   ForbiddenException,
-  ParseIntPipe,
-  Bind,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
-
 import * as bcrypt from 'bcrypt';
 import { FindOneParams } from './dto/findOne-user.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
@@ -29,7 +28,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+  @UseInterceptors(ClassSerializerInterceptor)
+  async create(@Body() createUserDto: CreateUserDto) {
+    //, @Res() res: Response) {
     // VERIFIE SI LE USERNAME EST DEJA EXISTANT
     const saltOrRounds = 10;
 
@@ -62,14 +63,13 @@ export class UsersController {
     // HASHAGE DU PASSWORD
     const hash = await bcrypt.hash(createUserDto.password, saltOrRounds);
 
-    // CREATION D'UN NOUVEAU USER
-    const newUser = await this.usersService.create(createUserDto, hash);
+    const user = await this.usersService.create(createUserDto, hash);
 
-    return res.status(201).json({
-      status: 'OK',
-      message: 'User créé',
-      data: newUser,
-    });
+    return user;
+    // CREATION D'UN NOUVEAU USER
+    /* const newUser = await this.usersService.create(createUserDto, hash);
+
+    }); */
   }
 
   @Get()
