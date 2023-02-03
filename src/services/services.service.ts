@@ -52,7 +52,7 @@ export class ServicesService {
       return findServices;
     }
     return undefined;
-  }
+  };
 
   async update(userIdLogged: number, updateServiceDto: UpdateServiceDto) {
     const servicesToUpdate = await Service.findOneBy({
@@ -72,7 +72,20 @@ export class ServicesService {
       });
     }
     return undefined;
-  }
+  };
+
+  async updateReserved(id: number) {
+    const service = await Service.findOneBy({id: id});
+    service.reserved = true;
+    
+    const updatedService = await Service.update(id, service)
+
+    if (updatedService) {
+      return await Service.findOneBy({id: id});
+    };
+
+    return undefined;
+  };
 
   async remove(id: number) {
     const serviceToRemove = await Service.findOneBy({

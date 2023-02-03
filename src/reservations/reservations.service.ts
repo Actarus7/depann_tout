@@ -39,11 +39,17 @@ export class ReservationsService {
     return undefined;
   };
 
-  findOne(id: number) {
-    return `This action returns a #${id} reservation`;
-  }
+  async findOne(id: number) {
+    const reservation = await Reservation.findOneBy({id: id});
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
+    if (reservation) {
+      return reservation;
+    };
+
+    return undefined;
+  };
+
+  update(id: number) {
     return `This action updates a #${id} reservation`;
   }
 
