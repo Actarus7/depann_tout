@@ -1,36 +1,38 @@
-import { Equals, IsEmail, IsOptional, IsPostalCode, IsString } from "class-validator";
+import {
+  Equals,
+  IsEmail,
+  IsOptional,
+  IsPostalCode,
+  IsString,
+} from 'class-validator';
 
 export class CreateUserDto {
+  @IsString()
+  username: string;
 
-    @IsString()
-    username: string;
+  @IsEmail()
+  e_mail: string;
 
-    @IsEmail()
-    e_mail: string;
+  @IsString()
+  password: string;
 
-    @IsString()
-    password: string;
+  @IsString()
+  confirm_password: string;
 
-    // @Equals({password: })
-    @IsString()
-    confirm_password: string;
+  @IsString()
+  adress_line1: string;
 
-    @IsString()
-    adress_line1: string;
-    
-    @IsString()
-    @IsOptional()
-    adress_line2: string;
-    
-    @IsString()
-    @IsOptional()
-    adress_line3: string;
+  @IsString()
+  @IsOptional()
+  adress_line2: string;
 
-    // @IsPostalCode({locale: 'FRA'})
-    @IsString()
-    zipCode: string;
-    
-    @IsString()
-    city: string;
+  @IsString()
+  @IsOptional()
+  adress_line3: string;
 
-};
+  @IsPostalCode('FR')
+  zipCode: string;
+
+  @IsString()
+  city: string;
+}
