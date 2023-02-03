@@ -1,4 +1,4 @@
-import { IsDate, IsISO8601, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsString } from 'class-validator';
 
 export class CreateServiceDto {
   @IsString()
@@ -10,9 +10,9 @@ export class CreateServiceDto {
   @IsString()
   city: string;
 
-  @IsISO8601()
+  @IsDateString()
   start_time: Date;
 
-  @IsISO8601()
+  @IsDateString()
   end_time: Date;
 }

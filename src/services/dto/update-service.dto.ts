@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsISO8601, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsString } from 'class-validator';
 import { CreateServiceDto } from './create-service.dto';
 
 export class UpdateServiceDto extends PartialType(CreateServiceDto) {
@@ -12,9 +12,9 @@ export class UpdateServiceDto extends PartialType(CreateServiceDto) {
   @IsString()
   city: string;
 
-  @IsISO8601()
+  @IsDateString()
   start_time: Date;
 
-  @IsISO8601()
+  @IsDateString()
   end_time: Date;
 }

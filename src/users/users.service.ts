@@ -1,7 +1,5 @@
-import { Body, ForbiddenException, Injectable, Param, Patch, UseGuards, Request } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { FindOneParams } from './dto/findOne-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
@@ -9,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
   async create(createUserDto: CreateUserDto, hash: string) {
-
     const newUser = new User();
     newUser.username = createUserDto.username;
     newUser.e_mail = createUserDto.e_mail;
@@ -23,74 +20,74 @@ export class UsersService {
     await newUser.save();
 
     return newUser;
-  };
+  }
 
   async findAll() {
-    const users = await User.find()
+    const users = await User.find();
 
     if (users) {
       return users;
-    };
+    }
 
     return undefined;
-  };
+  }
 
   async findOneById(id: number) {
     const user = await User.findOneBy({ id: id });
 
     if (user) {
-      return user
-    };
+      return user;
+    }
 
     return undefined;
-  };
+  }
 
   async findOneByUsernameWithPassword(username: string) {
-    const user = await User.findOne({ // permet de contourner le "select: false" du password (pour la phase de login)
+    const user = await User.findOne({
+      // permet de contourner le "select: false" du password (pour la phase de login)
       where: { username: username },
-      select: ["id", "username", "password"]
     });
 
     if (user) {
       return user;
-    };
+    }
 
     return undefined;
-  };
+  }
 
   async findOneByUsername(username: string) {
-    const user = await User.findOneBy({username: username});
+    const user = await User.findOneBy({ username: username });
 
     if (user) {
       return user;
-    };
+    }
     return undefined;
-  };
-  
+  }
+
   async findOneByEmail(e_mail: string) {
-    const user = await User.findOneBy({e_mail: e_mail});
+    const user = await User.findOneBy({ e_mail: e_mail });
 
     if (user) {
       return user;
-    };
+    }
     return undefined;
-  };
+  }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       const hash = await bcrypt.hash(updateUserDto.password, 10);
 
       updateUserDto.password = hash;
-    };
+    }
 
     const updateUser = await User.update(+id, updateUserDto);
 
     if (updateUser) {
       return await User.findOneBy({ id: id });
-    };
+    }
 
     return undefined;
-  };
+  }
 
   async remove(id: number) {
     const deletedUser = await User.findOneBy({ id: id });
@@ -98,9 +95,8 @@ export class UsersService {
 
     if (deletedUser) {
       return deletedUser;
-    };
+    }
 
     return undefined;
-  };
-
-};
+  }
+}

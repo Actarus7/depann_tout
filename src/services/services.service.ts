@@ -41,7 +41,7 @@ export class ServicesService {
   async findOne(id: number) {
     const service = await Service.find({
       relations: { user: true },
-      select: { user: { username: true } },
+      select: { user: { username: true, id: true } },
       where: { id, reserved: false },
     });
 
