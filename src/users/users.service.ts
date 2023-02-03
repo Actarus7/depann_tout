@@ -19,6 +19,7 @@ export class UsersService {
 
     await newUser.save();
 
+    // const newUser = await User.create(createUserDto).save() // modifier le password de createUserDto par hash avant de l'envoyer dans service
     return newUser;
   }
 

@@ -47,10 +47,10 @@ export class ServicesService {
 
     if (service) {
       return service;
-    }
+    };
 
     return undefined;
-  }
+  };
 
   async findName(getServiceDto: GetServiceDto) {
     const findServices = await Service.find({

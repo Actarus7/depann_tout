@@ -3,6 +3,7 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { Reservation } from './entities/reservation.entity';
 
+
 @Injectable()
 export class ReservationsService {
   async create(createReservationDto: CreateReservationDto | any, numero: number, userIdLogged: number | any) {
@@ -17,7 +18,6 @@ export class ReservationsService {
     
   };
 
-
   async findAll() {
     const reservations = await Reservation.find();
 
@@ -27,6 +27,7 @@ export class ReservationsService {
 
     return undefined;
   };
+  
   async findAllNumbers() {
     const reservations = await Reservation.find({
       select: {numero: true}
@@ -49,11 +50,12 @@ export class ReservationsService {
     return undefined;
   };
 
-  update(id: number) {
+  // NON DEMANDE SUR LE BRIEF
+  /* update(id: number) {
     return `This action updates a #${id} reservation`;
   }
 
   remove(id: number) {
     return `This action removes a #${id} reservation`;
-  }
+  } */
 }

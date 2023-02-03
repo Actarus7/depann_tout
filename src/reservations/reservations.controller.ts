@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, BadRequestException, Bind, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, BadRequestException, Bind, ParseIntPipe, ForbiddenException } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -24,14 +24,15 @@ export class ReservationsController {
     const isServiceExists = await this.servicesService.findOne(
       createReservationDto.service,
     );
-
-    if (!isServiceExists) {
+    
+    if (isServiceExists.length === 0) {
       throw new BadRequestException("Le service demandé n'existe pas ou est déjà réservé");
     };
  
 
     // RECUPERE LE USER ID DU USER CONNECTE
     const userIdLogged = req.user.id;
+
 
     // GENERE UN RANDOM ALEATOIRE ET VERIFIE QU'IL N'EXISTE PAS DEJA DANS LA BASE DE DONNEE
     const numeroExistants = await this.reservationsService.findAllNumbers();
@@ -48,8 +49,14 @@ export class ReservationsController {
     // CREATION D'UNE NOUVELLE RESERVATION
     const newReservation = await this.reservationsService.create(createReservationDto, numero, userIdLogged);
 
-    // SWITCH LA PROPRIETE "RESERVED FALSE" DU SERVICE DE FALSE A TRUE
 
+    // VERIFIE QUE LE USER CONNECTE N'EST PAS LE PROPRIETAIRE DU SERVICE
+    if (userIdLogged !== isServiceExists[0].user.id) {
+      throw new ForbiddenException('Vous ne pouvez pas réservé un service que vous proposez');
+    };
+
+
+    // SWITCH LA PROPRIETE "RESERVED FALSE" DU SERVICE DE FALSE A TRUE
     const updatedService = await this.servicesService.updateReserved(createReservationDto.service)
 
     return res.status(201).json({
@@ -94,7 +101,8 @@ export class ReservationsController {
 
   };
 
-  @Patch(':id')
+  // NON DEMANDE AU BRIEF
+  /* @Patch(':id')
   async update(@Param('id') id: string) {
 
     // const updated = await this.servicesService.updateReserved()
@@ -106,6 +114,6 @@ export class ReservationsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.reservationsService.remove(+id);
-  };
+  }; */
 
 };
