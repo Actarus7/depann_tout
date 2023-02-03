@@ -11,8 +11,8 @@ export class CreateUserDto {
     @IsString()
     password: string;
 
-    // @Equals({password: })
     @IsString()
+    // @Equals("password")
     confirm_password: string;
 
     @IsString()

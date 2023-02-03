@@ -22,12 +22,12 @@ export class AuthController {
     return user;
   };
 
-  @UseGuards(JwtAuthGuard)
+  /* @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Request() req) {
 
     const user = await this.usersService.findOneByUsername(req.user.username);
 
     return user;
-  };
+  }; */
 };

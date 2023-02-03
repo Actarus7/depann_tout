@@ -9,7 +9,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOneByUsernameWithPassword(
@@ -30,8 +30,8 @@ export class AuthService {
     // console.log(user);
 
     const payload = {
-      /* username: loginUserDto.username, sub: loginUserDto.id, admin: loginUserDto.admin */ username:
-        user.username,
+      /* username: loginUserDto.username, sub: loginUserDto.id, admin: loginUserDto.admin */
+      username: user.username,
       sub: user.id,
       admin: user.admin,
     };
