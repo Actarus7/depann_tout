@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { identity } from 'rxjs';
+import { User } from 'src/users/entities/user.entity';
 import { Like } from 'typeorm';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { GetServiceDto } from './dto/get-service.dto';
@@ -8,7 +8,7 @@ import { Service } from './entities/service.entity';
 
 @Injectable()
 export class ServicesService {
-  create(userIdLogged, createServiceDto: CreateServiceDto) {
+  create(userIdLogged: User, createServiceDto: CreateServiceDto) {
     const newService = new Service();
     newService.name = createServiceDto.name;
     newService.price = createServiceDto.price;
@@ -63,7 +63,7 @@ export class ServicesService {
       return findServices;
     }
     return undefined;
-  };
+  }
 
   async update(id: number, updateServiceDto: UpdateServiceDto) {
     const servicesToUpdate = await Service.findOneBy({
@@ -83,20 +83,20 @@ export class ServicesService {
       });
     }
     return undefined;
-  };
+  }
 
   async updateReserved(id: number) {
-    const service = await Service.findOneBy({id: id});
+    const service = await Service.findOneBy({ id: id });
     service.reserved = true;
-    
-    const updatedService = await Service.update(id, service)
+
+    const updatedService = await Service.update(id, service);
 
     if (updatedService) {
-      return await Service.findOneBy({id: id});
-    };
+      return await Service.findOneBy({ id: id });
+    }
 
     return undefined;
-  };
+  }
 
   async remove(id: number) {
     const serviceToRemove = await Service.findOneBy({
