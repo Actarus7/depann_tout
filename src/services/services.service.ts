@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { identity } from 'rxjs';
 import { Like } from 'typeorm';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { GetServiceDto } from './dto/get-service.dto';
@@ -24,28 +25,29 @@ export class ServicesService {
   }
 
   async findAll() {
-    const services = await Service.find();
+    const services = await Service.findBy({ reserved: false });
 
     if (services) {
       return services;
-    };
-    
+    }
+
     return undefined;
-  };
+  }
 
   async findOne(id: number) {
-    const service = await Service.findOneBy({id});
+    const service = await Service.findOneBy({ id, reserved: false });
 
     if (service) {
       return service;
-    };
-    
+    }
+
     return undefined;
-  };
+  }
 
   async findName(getServiceDto: GetServiceDto) {
     const findServices = await Service.findBy({
       name: Like(`%${getServiceDto.name}%`),
+      reserved: false,
     });
 
     if (findServices) {
@@ -54,9 +56,9 @@ export class ServicesService {
     return undefined;
   };
 
-  async update(userIdLogged: number, updateServiceDto: UpdateServiceDto) {
+  async update(id: number, updateServiceDto: UpdateServiceDto) {
     const servicesToUpdate = await Service.findOneBy({
-      id: userIdLogged,
+      id: id,
     });
     servicesToUpdate.name = updateServiceDto.name;
     servicesToUpdate.price = updateServiceDto.price;
@@ -68,7 +70,7 @@ export class ServicesService {
 
     if (servicesToUpdate) {
       return await Service.findOneBy({
-        id: userIdLogged,
+        id: id,
       });
     }
     return undefined;

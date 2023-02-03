@@ -10,15 +10,20 @@ import { Response } from 'express';
 export class ReservationsController {
   constructor(
     private readonly reservationsService: ReservationsService,
-    private readonly servicesService: ServicesService
-  ) { }
+    private readonly servicesService: ServicesService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createReservationDto: CreateReservationDto, @Request() req, @Res() res: Response) {
-
-    // VERIFIE SI LE SERVICE RESERVE EXISTE ET RENVOIE UNE ERREUR EN CONSEQUENCE
-    const isServiceExists = await this.servicesService.findOne(createReservationDto.service)
+  async create(
+    @Body() createReservationDto: CreateReservationDto,
+    @Request() req,
+    @Res() res: Response,
+  ) {
+    // VERIFIE SI LE SERVICE RESERVE EXISTE
+    const isServiceExists = await this.servicesService.findOne(
+      createReservationDto.service,
+    );
 
     if (!isServiceExists) {
       throw new BadRequestException("Le service demandé n'existe pas ou est déjà réservé");
@@ -27,7 +32,6 @@ export class ReservationsController {
 
     // RECUPERE LE USER ID DU USER CONNECTE
     const userIdLogged = req.user.id;
-
 
     // GENERE UN RANDOM ALEATOIRE ET VERIFIE QU'IL N'EXISTE PAS DEJA DANS LA BASE DE DONNEE
     const numeroExistants = await this.reservationsService.findAllNumbers();
