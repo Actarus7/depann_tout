@@ -64,19 +64,17 @@ export class ServicesController {
   @Patch(':id')
   @Bind(Param('id', new ParseIntPipe()))
   async update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateServiceDto: UpdateServiceDto,
     @Res() res: Response,
-    @Request() req,
   ) {
-    const userIdLogged = req.user.id;
-    const isUserExist = await this.usersService.findOneById(+id);
+    const isServiceExist = await this.servicesService.findOne(+id);
 
-    if (!isUserExist) {
-      throw new BadRequestException('User id inconnu');
+    if (!isServiceExist) {
+      throw new BadRequestException('Service id inconnu');
     }
     const updateService = await this.servicesService.update(
-      userIdLogged,
+      id,
       updateServiceDto,
     );
     return res.status(201).json({

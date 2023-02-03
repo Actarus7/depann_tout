@@ -33,20 +33,35 @@ export class ReservationsController {
     @Res() res: Response,
   ) {
     // VERIFIE SI LE SERVICE RESERVE EXISTE
-    /* const isServiceExists = await this.servicesService.findOne(createReservationDto.service)
+    const isServiceExists = await this.servicesService.findOne(
+      createReservationDto.service,
+    );
 
     if (!isServiceExists) {
       throw new BadRequestException("Le service demandé n'existe pas");
-    } */
+    }
 
     // RECUPERE LE USER ID DU USER CONNECTE
     const userIdLogged = req.user.id;
 
     // GENERE UN RANDOM ALEATOIRE ET VERIFIE QU'IL N'EXISTE PAS DEJA DANS LA BASE DE DONNEE
-    const numero = Math.floor(Math.random());
-    console.log(numero);
+    const numeroExistants = await this.reservationsService.findAllNumbers();
 
-    return this.reservationsService.create(createReservationDto);
+    // console.log(numeroExistants);
+
+    const numero = Math.floor(Math.random() * 10000);
+
+    const newReservation = await this.reservationsService.create(
+      createReservationDto,
+      numero,
+      userIdLogged,
+    );
+
+    return res.status(201).json({
+      status: 'OK',
+      message: 'Réservation créée',
+      data: newReservation,
+    });
   }
 
   @Get()
