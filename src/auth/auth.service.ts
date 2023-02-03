@@ -33,7 +33,6 @@ export class AuthService {
       /* username: loginUserDto.username, sub: loginUserDto.id, admin: loginUserDto.admin */
       username: user.username,
       sub: user.id,
-      admin: user.admin,
     };
     // console.log(payload);
 
@@ -41,7 +40,6 @@ export class AuthService {
       id: payload.sub,
       username: payload.username,
       access_token: this.jwtService.sign(payload),
-      admin: payload.admin,
     };
   }
 }
