@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
+
+  /* // CREATION D'UN NOUVEAU USER - ALTERNATIVE 1
   async create(createUserDto: CreateUserDto, hash: string) {
     const newUser = new User();
     newUser.username = createUserDto.username;
@@ -19,30 +21,38 @@ export class UsersService {
 
     await newUser.save();
 
-    // const newUser = await User.create(createUserDto).save() // modifier le password de createUserDto par hash avant de l'envoyer dans service
-    return newUser;
-  }
+    return newUser; 
+  }; */
 
+  // CREATION D'UN NOUVEAU USER - ALTERNATIVE 2
+  async create(createUserDto: CreateUserDto) {
+    const newUser = await User.create(createUserDto).save();
+    return newUser;
+  };
+
+  // RECUPERE TOUS LES USERS
   async findAll() {
     const users = await User.find();
 
     if (users) {
       return users;
-    }
+    };
 
     return undefined;
-  }
+  };
 
+  // RECUPERE UN USER PAR SON ID
   async findOneById(id: number) {
     const user = await User.findOneBy({ id: id });
 
     if (user) {
       return user;
-    }
+    };
 
     return undefined;
-  }
+  };
 
+  // RECUPERE UN USER PAR SON USERNAME (avec password)
   async findOneByUsernameWithPassword(username: string) {
     const user = await User.findOne({
       // permet de contourner le "select: false" du password (pour la phase de login)
@@ -51,11 +61,12 @@ export class UsersService {
 
     if (user) {
       return user;
-    }
+    };
 
     return undefined;
-  }
+  };
 
+  // RECUPERE UN USER PAR SON USERNAME
   async findOneByUsername(username: string) {
     const user = await User.findOneBy({ username: username });
 
@@ -63,41 +74,48 @@ export class UsersService {
       return user;
     }
     return undefined;
-  }
+  };
 
+  // RECUPERE UN USER PAR SON EMAIL
   async findOneByEmail(e_mail: string) {
     const user = await User.findOneBy({ e_mail: e_mail });
 
     if (user) {
       return user;
-    }
-    return undefined;
-  }
-
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      const hash = await bcrypt.hash(updateUserDto.password, 10);
-
-      updateUserDto.password = hash;
-    }
-
-    const updateUser = await User.update(+id, updateUserDto);
-
-    if (updateUser) {
-      return await User.findOneBy({ id: id });
-    }
+    };
 
     return undefined;
-  }
+  };
+};
 
-  async remove(id: number) {
-    const deletedUser = await User.findOneBy({ id: id });
-    deletedUser.remove();
 
-    if (deletedUser) {
-      return deletedUser;
-    }
+// NON DEMANDE
+/* // MODIFIE UN USER
+async update(id: number, updateUserDto: UpdateUserDto) {
+  if (updateUserDto.password) {
+    const hash = await bcrypt.hash(updateUserDto.password, 10);
 
-    return undefined;
-  }
-}
+    updateUserDto.password = hash;
+  };
+
+  const updateUser = await User.update(+id, updateUserDto);
+
+  if (updateUser) {
+    return await User.findOneBy({ id: id });
+  };
+
+  return undefined;
+};
+
+// SUPPRIME UN USER
+async remove(id: number) {
+  const deletedUser = await User.findOneBy({ id: id });
+  deletedUser.remove();
+
+  if (deletedUser) {
+    return deletedUser;
+  };
+
+  return undefined;
+}; */
+

@@ -20,7 +20,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar' })
   e_mail: string;
 
-  @Exclude()
+  @Exclude() // permet d'exclure le password de toute remontée d'affichage
   @Column({ type: 'varchar' })
   password: string;
 

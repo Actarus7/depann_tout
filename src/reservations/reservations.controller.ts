@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Res, BadRequestException, Bind, ParseIntPipe, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request, Res, BadRequestException, Bind, ParseIntPipe, ForbiddenException } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 import { ServicesService } from 'src/services/services.service';
 import { Response } from 'express';
@@ -11,8 +10,13 @@ export class ReservationsController {
   constructor(
     private readonly reservationsService: ReservationsService,
     private readonly servicesService: ServicesService,
-  ) {}
+  ) { }
 
+  /** CREATION D'UNE RESERVATION:
+   * * nécessite d'être connecté/enregistré
+   * * passage en true de la propriété "reserved" d'un service
+   * * vérification de la non appartenance du service
+   */
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
@@ -21,14 +25,14 @@ export class ReservationsController {
     @Res() res: Response,
   ) {
     // VERIFIE SI LE SERVICE RESERVE EXISTE
-    const isServiceExists = await this.servicesService.findOne(
+    const isServiceExists = await this.servicesService.findOneReservedFalse(
       createReservationDto.service,
     );
-    
-    if (isServiceExists.length === 0) {
+
+    if (isServiceExists.length < 1) {
       throw new BadRequestException("Le service demandé n'existe pas ou est déjà réservé");
     };
- 
+
 
     // RECUPERE LE USER ID DU USER CONNECTE
     const userIdLogged = req.user.id;
@@ -46,14 +50,14 @@ export class ReservationsController {
     };
 
 
-    // CREATION D'UNE NOUVELLE RESERVATION
-    const newReservation = await this.reservationsService.create(createReservationDto, numero, userIdLogged);
-
-
     // VERIFIE QUE LE USER CONNECTE N'EST PAS LE PROPRIETAIRE DU SERVICE
     if (userIdLogged !== isServiceExists[0].user.id) {
       throw new ForbiddenException('Vous ne pouvez pas réservé un service que vous proposez');
     };
+
+
+    // CREATION D'UNE NOUVELLE RESERVATION
+    const newReservation = await this.reservationsService.create(createReservationDto, numero, userIdLogged);
 
 
     // SWITCH LA PROPRIETE "RESERVED FALSE" DU SERVICE DE FALSE A TRUE
@@ -62,58 +66,56 @@ export class ReservationsController {
     return res.status(201).json({
       status: 'OK',
       message: 'Réservation créée',
-      data: {newReservation, updatedService}
+      data: { newReservation, updatedService }
     });
 
   };
 
+
+  // RECUPERATION DE TOUTES LES RESERVATIONS
   @Get()
-  async findAll(@Res() res: Response) {
+  async findAll() {
 
     const reservations = await this.reservationsService.findAll();
 
     if (!reservations) {
       throw new BadRequestException('Aucune réservation à afficher');
     };
-    
-    return res.status(201).json({
-      status: 'OK',
-      message: 'Réservations',
-      data: reservations
-    });
+
+    return reservations;
   };
 
+
+  // RECUPERATION D'UNE RESERVATION PAR SON ID
   @Get(':id')
   @Bind(Param('id', new ParseIntPipe()))
-  findOne(@Param('id') id: number, @Res() res: Response) {
+  async findOne(@Param('id') id: number, @Res() res: Response) {
 
-    const reservation = this.reservationsService.findOne(+id);
+    const reservation = await this.reservationsService.findOne(+id);
 
     if (!reservation) {
       throw new BadRequestException('Reservation id inconnue');
     };
 
-    return res.status(201).json({
-      status: 'OK',
-      message: 'Réservation',
-      data: reservation
-    }); 
+    return (reservation)
 
   };
-
-  // NON DEMANDE AU BRIEF
-  /* @Patch(':id')
-  async update(@Param('id') id: string) {
-
-    // const updated = await this.servicesService.updateReserved()
-
-    // faire un update du service pour passer la colonne "reserved" de false à true
-    return this.reservationsService.update(+id);
-  };
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reservationsService.remove(+id);
-  }; */
 
 };
+
+
+  // NON DEMANDE AU BRIEF
+/* @Patch(':id')
+async update(@Param('id') id: string) {
+
+  // const updated = await this.servicesService.updateReserved()
+
+  // faire un update du service pour passer la colonne "reserved" de false à true
+  return this.reservationsService.update(+id);
+};
+
+@Delete(':id')
+remove(@Param('id') id: string) {
+  return this.reservationsService.remove(+id);
+}; */
+

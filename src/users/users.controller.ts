@@ -25,143 +25,143 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
+  // CREATION D'UN NOUVEAU USER
   @Post()
   @UseInterceptors(ClassSerializerInterceptor)
   async create(@Body() createUserDto: CreateUserDto) {
-    //, @Res() res: Response) {
+
     // VERIFIE SI LE USERNAME EST DEJA EXISTANT
     const saltOrRounds = 10;
 
-    const isUsernameExists = await this.usersService.findOneByUsername(
-      createUserDto.username,
-    );
+    const isUsernameExists = await this.usersService.findOneByUsername(createUserDto.username);
 
     if (isUsernameExists) {
-      throw new ConflictException(
-        'Username déjà existant, choisissez-en un autre',
-      );
-    }
+      throw new ConflictException('Username déjà existant, choisissez-en un autre');
+    };
+
 
     // VERIFIE SI L'EMAIL EST DEJA EXISTANT
-    const isEmailExists = await this.usersService.findOneByEmail(
-      createUserDto.e_mail,
-    );
+    const isEmailExists = await this.usersService.findOneByEmail(createUserDto.e_mail);
 
     if (isEmailExists) {
-      throw new ConflictException(
-        'Username déjà existant, choisissez-en un autre',
-      );
-    }
+      throw new ConflictException('Username déjà existant, choisissez-en un autre');
+    };
+
 
     // VERIFIE LE PASSWORD ET LA CONFIRMATION PASSWORD
-    /*    if (createUserDto.password !== createUserDto.confirm_password) {
+    if (createUserDto.password !== createUserDto.confirm_password) {
       throw new BadRequestException('Le password et la confirmation password ne sont pas identiques');
-    }; */
+    };
+
 
     // HASHAGE DU PASSWORD
     const hash = await bcrypt.hash(createUserDto.password, saltOrRounds);
+    createUserDto.password = hash;
 
-    const user = await this.usersService.create(createUserDto, hash);
+    // CREATION D'UN NOUVEAU USER
+    const user = await this.usersService.create(createUserDto);
 
     return user;
-    // CREATION D'UN NOUVEAU USER
-    /* const newUser = await this.usersService.create(createUserDto, hash);
+  };
 
-    }); */
-  }
 
+  // RECUPERATION DES TOUS LES USERS
   @Get()
-  async findAll(@Res() res: Response) {
+  @UseInterceptors(ClassSerializerInterceptor)
+  async findAll() {
     const users = await this.usersService.findAll();
 
     if (!users) {
       throw new BadRequestException('Aucun user à afficher');
     }
 
-    return res.status(200).json({
-      status: 'OK',
-      message: 'Users',
-      data: users,
-    });
-  }
+    return users;
+  };
 
+
+  // RECUPERATION D'UN USER PAR ID
   @Get(':id')
-  async findOne(@Param() params: FindOneParams, @Res() res: Response) {
+  @UseInterceptors(ClassSerializerInterceptor)
+  async findOne(@Param() params: FindOneParams) {
     const user = await this.usersService.findOneById(+params.id);
 
     if (!user) {
       throw new BadRequestException('User id inconnu');
-    }
+    };
 
-    return res.status(200).json({
-      status: 'OK',
-      message: 'User',
-      data: user,
-    });
+    return user;
+  };
+};
+
+
+
+// NON DEMANDE
+  // MODIFIER UN USER
+/* @UseGuards(JwtAuthGuard)
+// @Bind(Param('id'), new ParseIntPipe())
+@Patch(':id')
+@UseInterceptors(ClassSerializerInterceptor)
+async update(
+  @Param() params: FindOneParams,
+  @Body() updateUserDto: UpdateUserDto,
+  @Request() req,
+  @Res() res: Response,
+) {
+  const userLogged = req.user;
+
+  const isUser = await this.usersService.findOneById(+params.id);
+
+  if (!isUser) {
+    throw new BadRequestException('User inconnu');
   }
 
-  @UseGuards(JwtAuthGuard)
-  // @Bind(Param('id'), new ParseIntPipe())
-  @Patch(':id')
-  async update(
-    @Param() params: FindOneParams,
-    @Body() updateUserDto: UpdateUserDto,
-    @Request() req,
-    @Res() res: Response,
-  ) {
-    const userLogged = req.user;
+  if (userLogged.id !== isUser.id) {
+    throw new ForbiddenException("Vous n'êtes pas le User à modifier");
+  }
 
-    const isUser = await this.usersService.findOneById(+params.id);
+  const updatedUser = await this.usersService.update(
+    +params.id,
+    updateUserDto,
+  );
 
-    if (!isUser) {
-      throw new BadRequestException('User inconnu');
-    }
+  return res.status(200).json({
+    status: 'OK',
+    message: 'User modifié',
+    data: updatedUser,
+  });
+} */
 
-    if (userLogged.id !== isUser.id) {
-      throw new ForbiddenException("Vous n'êtes pas le User à modifier");
-    }
+  // SUPPRIMER UN USER
+/* @UseGuards(JwtAuthGuard)
+@Delete(':id')
+@UseInterceptors(ClassSerializerInterceptor)
+async remove(
+  @Param() params: FindOneParams,
+  @Request() req,
+  @Res() res: Response,
+) {
+  const userLogged = req.user;
 
-    const updatedUser = await this.usersService.update(
-      +params.id,
-      updateUserDto,
+  const isUser = await this.usersService.findOneById(+params.id);
+
+  if (!isUser) {
+    throw new BadRequestException('User inconnu');
+  }
+
+  if (userLogged.id !== isUser.id && !userLogged.admin) {
+    throw new ForbiddenException(
+      "Vous n'êtes pas admin ou le User à modifier",
     );
-
-    return res.status(200).json({
-      status: 'OK',
-      message: 'User modifié',
-      data: updatedUser,
-    });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async remove(
-    @Param() params: FindOneParams,
-    @Request() req,
-    @Res() res: Response,
-  ) {
-    const userLogged = req.user;
+  const deletedUser = await this.usersService.remove(+params.id);
 
-    const isUser = await this.usersService.findOneById(+params.id);
+  return res.status(200).json({
+    status: 'OK',
+    message: 'User supprimé',
+    data: deletedUser,
+  });
+} */
 
-    if (!isUser) {
-      throw new BadRequestException('User inconnu');
-    }
-
-    if (userLogged.id !== isUser.id && !userLogged.admin) {
-      throw new ForbiddenException(
-        "Vous n'êtes pas admin ou le User à modifier",
-      );
-    }
-
-    const deletedUser = await this.usersService.remove(+params.id);
-
-    return res.status(200).json({
-      status: 'OK',
-      message: 'User supprimé',
-      data: deletedUser,
-    });
-  }
-}
